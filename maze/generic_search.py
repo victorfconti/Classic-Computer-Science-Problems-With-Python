@@ -1,4 +1,5 @@
 from __future__ import annotations
+from queue import Queue
 from node import Node
 from typing import TypeVar, Iterable, Sequence, Generic, List, Callable, Set, Deque, Dict, Any, Optional, Protocol
 from heapq import heappush, heappop
@@ -55,12 +56,12 @@ def dfs(initial: T, goal_test: Callable[[T], bool], successors: Callable[[T], Li
 
     while not frontier.empty:
         current_node: Node[T] = frontier.pop()
-        current_status: T = current_node.state
+        current_state: T = current_node.state
         
-        if goal_test(current_status):
+        if goal_test(current_state):
             return current_node
 
-        for child in successors(current_status):
+        for child in successors(current_state):
             if child in explored:
                 continue
             
@@ -68,6 +69,27 @@ def dfs(initial: T, goal_test: Callable[[T], bool], successors: Callable[[T], Li
             frontier.push(Node(child, current_node))
     
     return None
+
+
+def bfs(initial: T, goal_test: Callable[[T], bool], successors: Callable[[T], List[T]]) -> Optional[Node[T]]:
+    frontier: Queue[Node[T]] = Queue()
+    frontier.push(Node(initial, None))
+    explored: Set[T] = {initial}
+
+    while not frontier.empty:
+        current_node: Node[T] = frontier.pop()
+        current_state: T = current_node.state
+
+        if goal_test(current_state):
+            return current_node
+
+        for child in successors(current_state):
+            if child in explored:
+                continue
+            
+            explored.add(child)
+            frontier.push(Node(child, current_node))
+
 
 
 if __name__ == '__main__':
@@ -79,3 +101,4 @@ if __name__ == '__main__':
 
     print(binary_contains(["Adan", "Kleiton", "Zhorg"], "Kleiton"))
     print(binary_contains(["Adan", "Kleiton", "Zhorg"], "Kleithon"))
+

@@ -1,5 +1,5 @@
 import enum
-from generic_search import dfs
+from generic_search import bfs, dfs
 from node import Node, node_to_path
 import random
 from enum import Enum
@@ -85,8 +85,10 @@ class Maze:
 if __name__ == '__main__':
     maze: Maze = Maze()
     print(maze)
+    print()
 
     solution1: Optional[Node[MazeLocation]] = dfs(maze.start, maze.goal_test, maze.successors)
+    solution2: Optional[Node[MazeLocation]] = bfs(maze.start, maze.goal_test, maze.successors)
 
     if solution1 is None:
         print('No solutions found using depth-first search!')
@@ -95,3 +97,12 @@ if __name__ == '__main__':
         maze.mark(path=path1)
         print(maze)
         maze.clear(path1)
+
+
+    if solution2 is None:
+        print('No solutions found using breadth-first search!')
+    else:
+        path2: List[MazeLocation] = node_to_path(solution2)
+        maze.mark(path=path2)
+        print(maze)
+        maze.clear(path=path2)
