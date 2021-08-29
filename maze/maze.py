@@ -1,5 +1,5 @@
 import enum
-from generic_search import bfs, dfs
+from generic_search import astar, bfs, dfs
 from node import Node, node_to_path
 import random
 from enum import Enum
@@ -82,6 +82,22 @@ class Maze:
         self._grid[self.goal.row][self.goal.column] = Cell.EMPTY
 
 
+def euclidean_distance(goal: MazeLocation) -> Callable[[MazeLocation], float]:
+    def distance(ml: MazeLocation) -> float:
+        xdist: int = ml.column - goal.column
+        ydist: int = ml.row - goal.row
+        return sqrt(xdist**2 + ydist**2)
+    return distance
+
+
+def manhatan_distance(goal: MazeLocation) -> Callable[[MazeLocation], float]:
+    def distance(ml: MazeLocation) -> float:
+        xdist: int = ml.column - goal.column
+        ydist: int = ml.row - goal.row
+        return (xdist + ydist)
+    return distance
+
+
 if __name__ == '__main__':
     maze: Maze = Maze()
     print(maze)
@@ -89,6 +105,15 @@ if __name__ == '__main__':
 
     solution1: Optional[Node[MazeLocation]] = dfs(maze.start, maze.goal_test, maze.successors)
     solution2: Optional[Node[MazeLocation]] = bfs(maze.start, maze.goal_test, maze.successors)
+
+    euclidian_dist: Callable[[MazeLocation], float] = euclidean_distance(maze.goal)
+    manhatan_dist: Callable[[MazeLocation], float] = manhatan_distance(maze.goal)
+
+    solution3: Optional[Node[MazeLocation]] = astar(maze.start, maze.goal_test, maze.successors, euclidian_dist)
+    solution4: Optional[Node[MazeLocation]] = astar(maze.start, maze.goal_test, maze.successors, manhatan_dist)
+
+    print('Deep first search')
+    print()
 
     if solution1 is None:
         print('No solutions found using depth-first search!')
@@ -99,6 +124,9 @@ if __name__ == '__main__':
         maze.clear(path1)
 
 
+    print('Breadth first search')
+    print()
+
     if solution2 is None:
         print('No solutions found using breadth-first search!')
     else:
@@ -106,3 +134,27 @@ if __name__ == '__main__':
         maze.mark(path=path2)
         print(maze)
         maze.clear(path=path2)
+
+
+    print('A* with euclidian')
+    print()
+
+    if solution3 is None:
+        print('No solution found using A* with Euclidian distance')
+    else:
+        path3: List[MazeLocation] = node_to_path(solution3)
+        maze.mark(path=path3)
+        print(maze)
+        maze.clear(path=path3)
+
+
+    print('A* with Manhattan')
+    print()
+
+    if solution4 is None:
+        print('No solution found using A* with Euclidian distance')
+    else:
+        path4: List[MazeLocation] = node_to_path(solution4)
+        maze.mark(path=path4)
+        print(maze)
+        maze.clear(path=path4)
